@@ -1,0 +1,25 @@
+.hidden {
+    display: none;
+}
+.vertical-middle {
+    display: table-cell;
+    vertical-align: middle;
+}
+.panel.panel-default {
+    max-width: 500px;
+    width: 100%;
+    margin: 0 auto;
+}
+.message {
+    padding: 15px; 
+    margin: 0;
+}
+
+.brochure{
+        background-color: #CCC;
+        padding: 20px;
+}
+
+.result { background-color: #C9E5C6; }
+
+

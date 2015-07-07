@@ -1,0 +1,105 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function brochure_menu() {
+	$items['admin/config/services/brochuremail'] = array('title' => 'brochure Mail', 
+	'page callback' => 'drupal_get_form', 
+	'page arguments' => array('brochure_settings_form'), 
+	'access arguments' => array('administer site configuration'), 
+	'type' => MENU_NORMAL_ITEM, 
+	'file' => 'includes/brochure.page.inc', );
+	
+	$items['event/brochure/%'] = array(
+        'title' => 'Brochure Form', 
+        'page callback' => 'brochure', 
+        'file' => 'includes/brochure.page.inc',
+        'access arguments' => array('access content'),
+        'page arguments' => array(2),
+       );
+       
+       $items['event/brochure_download/%'] = array(
+        'title' => 'Brochure Form', 
+        'page callback' => 'brochure_download', 
+        'file' => 'includes/brochure.page.inc',
+        'access arguments' => array('access content'),
+        'page arguments' => array(2),
+       );
+       
+       $items['brochure/send'] = array(
+        'title' => '',
+        'page callback' => 'send_mail',
+        'access arguments' => array('access content'),
+       );
+	
+	 return $items; 
+}
+
+/**
+ * Implements hook_theme().
+ */
+
+function brochure_theme() {
+        $themes = array();
+        $themes['brochure'] = array(
+                'template' => 'theme/brochure',
+                'parameters' => array(),
+                'variables' => array('node' => NULL),
+        );
+        return $themes;
+}
+
+function send_mail(){
+       
+        error_reporting(E_ALL);
+        ini_set('display_errors', '1');
+        $formData = file_get_contents( 'php://input' );
+        $data = json_decode( $formData );
+     
+    //check if any of the inputs are empty
+    if (empty($data->inputName) || empty($data->inputEmail) || empty($data->inputPhone) || empty($data->inputCountry)) {
+        $data = array('success' => false, 'message' => 'Please fill out the form completely' );
+        echo json_encode($data);
+        exit;
+    }
+       
+        $to = variable_get('brochure_email');
+        $subject = "Brochure Message";
+        
+        $name           = $data->inputName;
+        $email          = $data->inputEmail;
+        $phone          = $data->inputPhone;
+        $country        =  $data->inputCountry;
+       
+        
+        $message        = "Name : $name<br>";
+        $message       .= "Email : $email<br>";
+        $message       .= "Phone : $phone;<br>";
+        $message       .= "Country : $country;<br>";
+      
+        //$headers        = "From:\r\n";
+        //$headers       .= "Reply-To: $email\r\n";
+        $headers       .= "MIME-Version: 1.0\r\n";
+        $headers       .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
+        
+        $mail = mail($to, $subject, $message, $headers);
+        
+        global $base_url;
+        $url = $base_url.'/event/brochure_download/'.$data->inputNid;
+   
+    if(!$mail) {
+        $data = array('success' => false, 'message' => 'Message could not be sent.', 'event_id' => '');
+        echo json_encode($data);
+        exit;
+    }
+
+    $data = array('success' => true, 'message' => 'Thanks! We have received your message.' , 'event_id' => $url);
+    echo json_encode($data);
+
+
+}
+
+
+
+?>	

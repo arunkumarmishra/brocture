@@ -1,0 +1,16 @@
+.message {
+    padding: 15px; 
+    margin: 0;
+}
+
+
+.brochure-download{
+        background-color: #CCC;
+        padding: 20px;
+}
+
+.brochure-message { background-color: #C9E5C6; padding: 15px; margin: 0; }
+
+.brochure-error { background-color: #E5C6CD; padding: 15px; margin: 0; }
+
+.brochure-main { margin-top:5px;}
